@@ -39,38 +39,6 @@
       [:a :d]]) =>
       [:a :c])
 
-(defn as-graph "Seq graph to map graph"
-  [g] (reduce (fn [r [n1 n2]] (if-let [v (r n1)]
-                               (assoc r n1 (conj v n2))
-                               (assoc r n1 #{n2})))
-              {}
-              (concat g (map rseq g))))
-
-(fact "Note: There can't be orphan in a seq graph"
-  (as-graph [[:a :b] [:b :c] [:a :d] [:e :e]]) => {:a #{:b :d},
-                                                   :b #{:a :c},
-                                                   :c #{:b},
-                                                   :d #{:a},
-                                                   :e #{:e},})
-
-(defn adv
-  [g tovisit visited?] 
-  (cond (= (count g) (count visited?)) true
-        (not tovisit)                  false
-        :else        (some #(adv g (clojure.set/difference (g %) visited?)
-                                 (conj visited? %))
-                           tovisit)))
- 
-(fact
-  (adv {:b #{:a :c}, :a #{:b}, :c #{:b}}
-       [:b]
-       #{}) => falsey)
-
-(fact
-  (adv {:b {:a #{:b}, :b #{:a :c}, :c #{:b}}}
-       [:a]
-       #{}) => truthy)
-
 (defn neigboors
   [n g] (filter #(some (partial = n) %) g))
 
@@ -78,18 +46,6 @@
   (neigboors :b [[:a :b] [:b :c]]) => [[:a :b] [:b :c]]
   (neigboors :a [[:a :b] [:b :c]]) => [[:a :b]]
   (neigboors :c [[:a :b] [:b :c]]) => [[:b :c]])
-
-(defn transv
-  [n g] (let [f #(some (partial = n) %)]
-          [(filter (complement f) g) (filter f g)])) 
-
-(fact
-  (transv :b [[:a :b] [:b :c]]) => [[]
-                                    [[:a :b] [:b :c]]]
-  (transv :a [[:a :b] [:b :c]]) => [[[:b :c]]
-                                    [[:a :b]]]
-  (transv :c [[:a :b] [:b :c]]) => [[[:a :b]]
-                                    [[:b :c]]])
 
 (defn extract-node
   [n [a b]] (if (= n a) b a))
@@ -119,23 +75,6 @@
 (fact
  (transv2 [:a [[:a :b] [:b :c]]]) => [[:b [[:b :c]]]]
  (transv2 [:b [[:b :c]]])         => [[:c []]])
-
-
-
-(defn adv-seq
-  ([n g] (do (println "(*) n=" n "g=" g) (adv-seq n (transv2 n g)
-                                                  []
-                                                  g)))
-  ([n [g tovisit] visited-count g-orig]
-     (do (println "n=" n "g=" g "tovisit=" tovisit "remaining-count=" visited-count )
-         (cond (empty? tovisit)        (do (println "->1") (= (count visited-count) (count g-orig)))  
-               (not tovisit)           (do (println "->2") false)
-               :else                   (do (println "->3") (some #(let [nxt (extract-node n %)]
-                                                                    (adv-seq nxt (transv nxt g) (conj visited-count %) g-orig))
-                                                                 tovisit))))))
-
-(future-fact
-  (adv-seq 1 [[1 2] [2 3] [3 4] [4 1]]) => truthy)
 
 (defn adv-seq2
   [[n g :as r]] (if (empty? r)
