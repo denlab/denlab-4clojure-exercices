@@ -108,55 +108,75 @@
 
 (defn transv2
   [[n g]] (map #(let [nxt (extract-node n %)]
-                  (vector nxt (remove (partial =)) ))
+                  (vector nxt (remove-first % g)))
                (neigboors n g)))
-(future-fact
+(fact
   (transv2 [:b [[:a :b] [:b :c]]]) => [[:a [[:b :c]]],
                                        [:c [[:a :b]]]]
   (transv2 [:a [[:b :c]]])         => []
   (transv2 [:c [[:a :b]]])         => [])
 
-(future-fact
-  (transv2 [:a [[:a :b] [:b :c]]]) => [:b [:b :c]]
-  (transv2 [:b [:b :c]])           => [:c []])
+(fact
+ (transv2 [:a [[:a :b] [:b :c]]]) => [[:b [[:b :c]]]]
+ (transv2 [:b [[:b :c]]])         => [[:c []]])
 
 
 
 (defn adv-seq
-  ([n g] (do (println "(*) n=" n "g=" g) (adv-seq n (transv n g) [] g)))
-  ([n [g tovisit] visited g-orig]
-     (do (println "n=" n "g=" g "tovisit=" tovisit "remaining-count=" visited )
-         (cond (empty? tovisit)        (do (println "->1") (= (count visited) (count g-orig)))  
+  ([n g] (do (println "(*) n=" n "g=" g) (adv-seq n (transv2 n g)
+                                                  []
+                                                  g)))
+  ([n [g tovisit] visited-count g-orig]
+     (do (println "n=" n "g=" g "tovisit=" tovisit "remaining-count=" visited-count )
+         (cond (empty? tovisit)        (do (println "->1") (= (count visited-count) (count g-orig)))  
                (not tovisit)           (do (println "->2") false)
                :else                   (do (println "->3") (some #(let [nxt (extract-node n %)]
-                                                                    (adv-seq nxt (transv nxt g) (conj visited %) g-orig))
+                                                                    (adv-seq nxt (transv nxt g) (conj visited-count %) g-orig))
                                                                  tovisit))))))
 
 (future-fact
   (adv-seq 1 [[1 2] [2 3] [3 4] [4 1]]) => truthy)
 
+(defn adv-seq2
+  [[n g :as r]] (if (empty? r)
+                  false
+                  (if (empty? g)
+                    true
+                    (let [childs (transv2 r)]
+                      (some adv-seq2
+                            childs)))))
+
+(fact
+ (adv-seq2 [1 [[1 2] [2 3] [3 4] [4 1]]]) => truthy)
+
+(fact
+ (adv-seq2 [:b [[:a :b] [:b :c]]]) => falsey)
+
+(fact
+ (adv-seq2 [:a [[:a :b] [:b :c]]]) => truthy)
+
 (defn f
-  [g] (some #(adv-seq % g)
+  [g] (some #(adv-seq2 [% g])
        (distinct (flatten g))))
 
-(future-fact
-  (f [[:a :b]]) => truthy )
+(fact
+  (f [[:a :b]]) => truthy)
 
-(future-fact
+(fact
   (f [[:a :a] [:b :b]]) => falsey )
 
-(future-fact
+(fact
   (f [[:a :b] [:a :b] [:a :c] [:c :a]
                [:a :d] [:b :d] [:c :d]]) => falsey )
 
-(future-fact
+(fact
   (f [[1 2] [2 3] [3 4] [4 1]]) => truthy )
 
-(future-fact
+(fact
   (f [[:a :b] [:a :c] [:c :b] [:a :e]
               [:b :e] [:a :d] [:b :d] [:c :e]
               [:d :e] [:c :f] [:d :f]]) => true )
 
-(future-fact
-  (f [[1 2] [2 3] [2 4] [2 5]]) => false )
+(fact
+  (f [[1 2] [2 3] [2 4] [2 5]]) => falsey)
 
