@@ -22,25 +22,8 @@
 ;; - You must visit each edge exactly once.
 ;; - All edges are undirected.
 
-(defn all "All nodes in a seq graph"
-  [g] (distinct (flatten g)))
-
-(fact
-  (all [[:a :b] [:b :c]]) => [:a :b :c])
-
-(defn nb "neigboors"
-  [n g] #_(all (filter #((set %) n)
-                     g)))
-
-#_(future-fact
- (nb :b
-     [[:a :b]
-      [:b :c]
-      [:a :d]]) =>
-      [:a :c])
-
-(defn neigboors
-  [n g] (filter #(some (partial = n) %) g))
+(def neigboors
+  (fn [n g] (filter #(some (partial = n) %) g)))
 
 (fact
   (neigboors :b [[:a :b] [:b :c]]) => [[:a :b] [:b :c]]
@@ -48,61 +31,38 @@
   (neigboors :c [[:a :b] [:b :c]]) => [[:b :c]])
 
 (defn extract-node
-  [n [a b]] (if (= n a) b a))
+  [n e] ({(e 0) (e 1)} n (e 0)))
 
 (fact
   (extract-node :a [:a :b]) => :b
   (extract-node :b [:a :b]) => :a)
 
-(defn remove-first "Like remove but for only one element"
-  [i s] (let [[f s] (split-with (partial not= i) s)]
-          (concat f (next s)))) 
+(def remove-first "Like remove but for only one element"
+  (fn [i s] (let [[f e] (split-with #(not= i %) s)]
+             (concat f (next e))))) 
 
 (fact
   (remove-first :b [:a :b :c :b :d]) => [:a :c :b :d])
 
-
-(defn transv2
-  [[n g]] (map #(let [nxt (extract-node n %)]
-                  (vector nxt (remove-first % g)))
-               (neigboors n g)))
-(fact
-  (transv2 [:b [[:a :b] [:b :c]]]) => [[:a [[:b :c]]],
-                                       [:c [[:a :b]]]]
-  (transv2 [:a [[:b :c]]])         => []
-  (transv2 [:c [[:a :b]]])         => [])
-
-(fact
- (transv2 [:a [[:a :b] [:b :c]]]) => [[:b [[:b :c]]]]
- (transv2 [:b [[:b :c]]])         => [[:c []]])
-
-(defn adv-seq2
-  [[n g :as r]] (if (empty? r)
-                  false
-                  (if (empty? g)
-                    true
-                    (let [childs (transv2 r)]
-                      (some adv-seq2
-                            childs)))))
-
-(fact
- (adv-seq2 [1 [[1 2] [2 3] [3 4] [4 1]]]) => truthy)
-
-(fact
- (adv-seq2 [:b [[:a :b] [:b :c]]]) => falsey)
-
-(fact
- (adv-seq2 [:a [[:a :b] [:b :c]]]) => truthy)
-
-(defn f
-  [g] (some #(adv-seq2 [% g])
-       (distinct (flatten g))))
+(def f
+  (fn [g]
+    (letfn
+        [(remove-one    [i s] (let [[f e] (split-with #(not= i %) s)]
+                                (concat f (next e))))
+         (get-node  [n [a b]] (if (= n a) b a))
+         (children    [[n g]] (map #(vector (get-node n %) (remove-one % g))
+                                   (filter #(some (partial = n) %) g)))
+         (tour? [[n g :as r]] (cond (empty? r) false
+                                    (empty? g) true
+                                    :else      (some tour? (children r))))] 
+      (true? (some #(tour? [% g]) 
+                   (distinct (flatten g)))))))
 
 (fact
   (f [[:a :b]]) => truthy)
 
 (fact
-  (f [[:a :a] [:b :b]]) => falsey )
+  (f [[:a :a] [:b :b]]) => false )
 
 (fact
   (f [[:a :b] [:a :b] [:a :c] [:c :a]
@@ -118,4 +78,6 @@
 
 (fact
   (f [[1 2] [2 3] [2 4] [2 5]]) => falsey)
+
+
 
