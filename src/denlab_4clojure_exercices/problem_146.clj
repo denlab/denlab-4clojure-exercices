@@ -28,8 +28,8 @@
                       [k2 v2] mv] [[k k2] v2] )))
 
 (defn f
-  [m]  (into {} (for [[k mv] m
-                      [k2 v2] mv] [[k k2] v2] )))
+  [s]  (into {} (for [[k m] s
+                      [p n] m] [[k p] n] )))
  
 (fact
   (f '{a {p 1, q 2}
