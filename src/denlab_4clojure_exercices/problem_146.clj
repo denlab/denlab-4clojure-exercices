@@ -1,6 +1,7 @@
 (ns ^{:doc "Problem: http://www.4clojure.com/problem/146"}
     denlab-4clojure-exercices.problem-146
-    (:use [midje.sweet]))
+    (:use [midje.sweet])
+    (:use [clojure.repl :only [doc]]))
 
 ;; Difficulty:	Easy
 ;; Topics:	seqs maps
@@ -23,19 +24,23 @@
 ;; result [k1 k2])
 
 (defn f
-  [m])
+  [m]  (into {} (for [[k mv] m
+                      [k2 v2] mv] [[k k2] v2] )))
 
+(defn f
+  [m]  (into {} (for [[k mv] m
+                      [k2 v2] mv] [[k k2] v2] )))
+ 
 (fact
   (f '{a {p 1, q 2}
        b {m 3, n 4}}) => '{[a p] 1, [a q] 2
-                              [b m] 3, [b n] 4})
+                           [b m] 3, [b n] 4})
 
 (fact
   (f '{[1] {a b c d}
-         [2] {q r s t u v w x}})
-  => '{[[1] a] b, [[1] c] d,
-     [[2] q] r, [[2] s] t,
-     [[2] u] v, [[2] w] x})
+       [2] {q r s t u v w x}}) => '{[[1] a] b, [[1] c] d,
+                                    [[2] q] r, [[2] s] t,
+                                    [[2] u] v, [[2] w] x})
 
 (fact
   (f '{m {1 [a b c] 3 nil}}) => '{[m 1] [a b c], [m 3] nil})
