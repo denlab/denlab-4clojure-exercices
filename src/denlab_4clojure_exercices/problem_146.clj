@@ -23,14 +23,9 @@
 ;; 1 That is, (get-in original [k1 k2]) should be the same as (get
 ;; result [k1 k2])
 
-(defn f
-  [m]  (into {} (for [[k mv] m
-                      [k2 v2] mv] [[k k2] v2] )))
+(def f
+  #(into {} (for [[k m] % [p n] m] [[k p] n])))
 
-(defn f
-  [s]  (into {} (for [[k m] s
-                      [p n] m] [[k p] n] )))
- 
 (fact
   (f '{a {p 1, q 2}
        b {m 3, n 4}}) => '{[a p] 1, [a q] 2
