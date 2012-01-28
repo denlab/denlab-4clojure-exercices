@@ -72,15 +72,12 @@
 
 (defn j
   [s]
-  (prn)
-  (prn (str "(j " s " )"))
   (if (second s)
-    (do (prn "->1") (set (doall (map #(do
-                                        (prn (str "(conj (j (disj " s % ")) " % ")"))
-                                        (prn (str "(conj (j " (disj s % ) ") " % ")"))
+    (do  (set (doall (map #(do
+        
                                         (conj (j (disj s %)) %))
                                      s))))
-    (do (prn "->2" "returning " #{s}) #{s})))
+    (do  #{s})))
 
 (future-fact
   (j #{:a :b :c #{}}) => #{#{}
@@ -89,21 +86,20 @@
                        #{:a :b :c}})
 
 (defn combin
-  [n s] (prn (str "(combin " n " " s ")")) (set (map #(conj % n) s)))
+  [n s]  (set (map #(conj % n) s)))
 
 (fact
   (combin :a #{#{:b} #{:c}}) => #{#{:a :b} #{:a :c}})
 
 (defn p
   [s]
-  (prn)
-  (prn (str "(p " s ")") )
+
   (if (seq s)
-    (do (prn "->1")
+    (do 
         (let [f (first s)
               prev (p (disj s f))]
           (into (conj prev #{f}) (combin f prev))))
-    (do (prn "->2")
+    (do 
         #{#{}})))
 
 
@@ -112,3 +108,12 @@
                        #{:a} #{:b} #{:c}
                        #{:a :b}  #{:a :c}  #{:b :c}
                        #{:a :b :c}})
+
+(fact
+  (p #{1 :a}) => #{#{1 :a} #{:a} #{} #{1}})
+(fact
+  (p #{}) => #{#{}})
+(fact
+  (p #{1 2 3}) =>    #{#{} #{1} #{2} #{3} #{1 2} #{1 3} #{2 3} #{1 2 3}})
+(fact
+  (count (p (into #{} (range 10)))) => 1024)
