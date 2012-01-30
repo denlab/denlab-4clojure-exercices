@@ -17,26 +17,17 @@
 ;; happy or not.  
 
 (defn mv
-  [n] (reduce #(let [i (Integer/valueOf (str %2))]
-                 (+ (* i i) %))
-       0
-       (str n)))
-
-(defn mv
-  [n] (reduce #(let [i (- (int %2) 48)]
-                 (+ (* i i) %))
-              0
-              (str n)))
+  [c] (reduce #(+ % (* %2 %2)) 0 (map #(- (int %) 48) (str c))))
 
 (fact
   (mv 123) => 14)
 
-(defn f
-  [k] (loop [c k p #{}]
-        (let [n  (mv c)]
-          (cond (= 1 n) true
-                (p n  ) false
-                1      (recur n (conj p c))))))
+(def f
+  (fn [k] (loop [c k p #{}]
+           (let [n (reduce #(+ % (* %2 %2)) 0 (map #(- (int %) 48) (str c)))]
+             (cond (= 1 n) true
+                   (p n  ) false
+                   1      (recur n (conj p c)))))))
 
 (fact
   (f 7) => true)
