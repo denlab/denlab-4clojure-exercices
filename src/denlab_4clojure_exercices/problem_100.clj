@@ -50,6 +50,10 @@
   [s] (let [[[a & m] [b & n] & r] (partition-by first s)]
         (apply concat [a b] m n r)))
 
+(defn pick-2-diff
+  [s] (let [[[a & m] [b & n] & r] (partition-by first s)]
+        (apply concat [a b] m n r)))
+
 (fact
  (pick-2-diff [[1 2]
                [1 4]
@@ -107,10 +111,39 @@
 (defn f
   [& a] (g (tomat a)))
 
+(defn pick-2-diff
+  [s] (let [[[a & m] [b & n] & r] (partition-by first s)]
+        (apply concat [a b] m n r)))
+
+
 (defn f
-  [& a] (g (map #(map (partial * %) 
-                      (map inc (range)))
-                a)))
+  [& a] (letfn [(sync-seq [[a b]] (if (= (first a) (first b))
+                                    [a b]
+                                    (sync-seq (align-seq (sort-by-first [a b])))))
+                (diff-first [s] (let [[[a & m] [b & n] & r] (partition-by first s)]
+                                  (apply concat [a b] m n r)))
+                (sync-seqs [s] (if (apply = (map first s)) (first (first s))
+                                   (let [[a b] (split-at 2 (diff-first s))]
+                                     (sync-seqs (concat (sync-seq a) b)))))]
+          (sync-seqs (map #(map (partial * %) 
+                                (map inc (range)))
+                          a))))
+
+(defn gcd
+  [& a] (loop [c (apply max a)]
+          (if (every? #(zero? (rem % c)) a)
+            c
+            (recur (dec c)))))
+
+(fact
+  (gcd 12 18 6) => 6)
+
+(def gcd
+  (fn [& a] (/ (reduce * a)
+              (loop [c (apply max a)]
+                (if (every? #(zero? (rem % c)) a)
+                  c
+                  (recur (dec c)))))))
 
 (fact
    (f 2 3) => 6)
@@ -122,3 +155,5 @@
    (f 3/4 1/6) => 3/2)
 (fact
    (f 7 5/7 2 3/5) => 210)
+
+
