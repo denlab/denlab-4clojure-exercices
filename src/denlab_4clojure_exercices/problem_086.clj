@@ -16,14 +16,23 @@
 ;; loops endlessly. Write a function that determines if a number is
 ;; happy or not.  
 
+(defn mv
+  [n] (reduce #(let [i (Integer/valueOf (str %2))]
+                 (+ (* i i) %))
+       0
+       (str n)))
+
+(fact
+  (mv 123) => 14)
+
 (defn f
   [n])
 
-(fact
+(future-fact
   (f 7) => true)
-(fact
+(future-fact
   (f 986543210) => true)
-(fact
+(future-fact
   (f 2) => false)
-(fact
+(future-fact
   (f 3) => false)
