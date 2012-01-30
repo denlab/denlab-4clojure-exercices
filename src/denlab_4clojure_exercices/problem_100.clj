@@ -13,77 +13,12 @@
 ;; function should accept a variable number of positive integers or
 ;; ratios.
 
-(unfinished )
-
-(defn div-by?
-  [a b] (zero? (rem a b)))
-
-(fact
-  (div-by? 4 2) => truthy
-  (div-by? 4 3) => falsey
-  (div-by? 3/2 3/4) =>  truthy)
-
-(defn nxt
-  [x s] (map #(if (div-by? % x) (/ % x) %) s))
-
-(fact
-  (nxt 2 [4 7 12 21 42]) => [2 7 6 21 21]
-  (nxt 2 [2 7 6  21 21]) => [1 7 3 21 21]
-  (nxt 3 [1 7 3  21 21]) => [1 7 1 7  7 ]
-  (nxt 7 [1 7 1  7  7 ]) => [1 1 1 1  1 ])
-
 (defn end?
   [s] (apply = (map first s)))
 
 (fact "end?"
       (end? [[1 2] [1 3] [1 4]]) => truthy
       (end? [[1 2] [1 3] [2 4]]) => falsey)
-
-(def f
-  (fn [& a] (take-while
-            (fn [[_ _ i]]
-              (do #_(prn "i=" i) (some
-                                  (partial not= 1) i)))
-            (iterate (fn [[b n s]] (if  (and (not= 1 n) (some #(div-by? % n) s))
-                                    [true  n       (nxt n s)]
-                                    [false (inc n)  s]))
-                     [true 1 a]))))
-
-(def f
-  (fn [& a] (iterate (fn [[b n s]] (if (and (not= 1 n) (some #(div-by? % n) s))
-                                   [true  n       (nxt n s)]
-                                   [false (inc n)  s]))
-                    [true 1 a])))
-
-(def f
-  (fn [& a] (take-while
-            (fn [[_ _ i]] (some (partial not= 1) i))
-            (iterate (fn [[b n s]] (if  (and (not= 1 n) (some #(div-by? % n) s))
-                                    [true  n       (nxt n s)]
-                                    [false (inc n)  s]))
-                     [false 2 a]))))
-
-(def f
-  (fn [& a] (take 2 (partition-by (fn [[_ _ i]] (some (partial not= 1) i))
-                                 (iterate (fn [[b n s]] (if (some #(div-by? % n) s)
-                                                         [true  n       (nxt n s)]
-                                                         [false (inc n)  s]))
-                                          [false 2 a])))))
-(def f
-  (fn [& a] (iterate (fn [[b n s]] (if (some #(div-by? % n) s)
-                                   [true  n       (nxt n s)]
-                                   [false (inc n)  s]))
-                    [false 2 a])))
-
-(def f
-  (fn [& a] 
-    (reduce (fn [r [b n s]] (if (= :take b) (* r n) r))
-            1
-            (take-while #(not= :end (first %))
-                        (iterate (fn [[_ n s]] (cond (every? #(= 1 %)       s) [:end  n       (nxt n s)]
-                                                    (some   #(div-by? % n) s) [:take  n       (nxt n s)]
-                                                    :else                     [:drop (inc n)  s]))
-                                 [:drop 2 a])))))
 
 (defn sort-by-first
   [s] (sort-by first s))
@@ -112,14 +47,8 @@
                  [12 15   ]]))
 
 (defn pick-2-diff
-  [s] (map first (take 2 (partition-by first s))))
-
-(defn pick-2-diff
   [s] (let [[[a & m] [b & n] & r] (partition-by first s)]
         (apply concat [a b] m n r)))
-
-[[1 2] [1 4] [2 3] [3 4]]
-
 
 (fact
  (pick-2-diff [[1 2]
@@ -130,13 +59,6 @@
                [5 5]]) => [[1 2] [2 3]
                            [1 4] [2 4] [3 4] [5 5]])
 
-(defn f
-  [& a] (do (prn "a = ") (pprint a) 
-            (cond (apply = (map first a)) (do (prn "->1") (first (first a)))
-                  (= 2 (count a))         (do (prn "->2") (appareil-seq (first a) (second a)))
-                  (= 1 (count a))         (do (prn "->3") a)
-                  :else                   (do (prn "->4") (concat (f (take 2 a)) (f (drop 2 a)))))))
-
 (defn extract-res
   [s] (first (first s)))
 
@@ -144,14 +66,10 @@
  (extract-res [[1 2] [1 3]]) => 1)
 
 (defn g
-  [s] (do #_(prn)
-          #_(prn "s=" s)
-          (if (end? s)
-            (do #_(prn "->1 foudn !!!") (extract-res s))
-            (do #_(prn "->2 ")
-                (let [[a b] (split-at 2 (pick-2-diff s))]
-                  #_(prn "a=" a "b=" b)
-                  (g (concat (appareil-seq a) b)))))))
+  [s] (if (end? s)
+        (extract-res s)
+        (let [[a b] (split-at 2 (pick-2-diff s))]
+          (g (concat (appareil-seq a) b)))))
 
 (fact 
  (g [:s1 :s2 :s3]) => :res
@@ -178,9 +96,9 @@
      (map #(* 7 (inc %)) (range))]) => 105)
 
 (defn tomat
-  [s] (map #(map (partial * %) 
+  [a] (map #(map (partial * %) 
                  (map inc (range)))
-           s))
+           a))
 
 (fact
   (take 3 (first  (tomat [1 2]))) => [1 2 3]
@@ -188,6 +106,11 @@
 
 (defn f
   [& a] (g (tomat a)))
+
+(defn f
+  [& a] (g (map #(map (partial * %) 
+                      (map inc (range)))
+                a)))
 
 (fact
    (f 2 3) => 6)
