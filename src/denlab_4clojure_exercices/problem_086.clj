@@ -22,17 +22,27 @@
        0
        (str n)))
 
+(defn mv
+  [n] (reduce #(let [i (- (int %2) 48)]
+                 (+ (* i i) %))
+              0
+              (str n)))
+
 (fact
   (mv 123) => 14)
 
 (defn f
-  [n])
+  [k] (loop [c k p #{}]
+        (let [n  (mv c)]
+          (cond (= 1 n) true
+                (p n  ) false
+                1      (recur n (conj p c))))))
 
-(future-fact
+(fact
   (f 7) => true)
-(future-fact
+(fact
   (f 986543210) => true)
-(future-fact
+(fact
   (f 2) => false)
-(future-fact
+(fact
   (f 3) => false)
