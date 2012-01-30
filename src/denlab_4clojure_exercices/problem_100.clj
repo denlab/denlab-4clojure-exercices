@@ -187,15 +187,15 @@
   (take 3 (second (tomat [1 2]))) => [2 4 6] )
 
 (defn f
-[& a])
+  [& a] (g (tomat a)))
 
-(future-fact
+(fact
    (f 2 3) => 6)
-(future-fact
+(fact
    (f 5 3 7) => 105)
-(future-fact
+(fact
    (f 1/3 2/5) => 2)
-(future-fact
+(fact
    (f 3/4 1/6) => 3/2)
-(future-fact
+(fact
    (f 7 5/7 2 3/5) => 210)
