@@ -115,19 +115,31 @@
   [s] (let [[[a & m] [b & n] & r] (partition-by first s)]
         (apply concat [a b] m n r)))
 
+(def g
+  (fn [& a] (letfn
+               [(align-seq  [[a b]] [(drop-while #(< % (first b)) a) b])
+                (sync-seq   [[a b]] (if (= (first a) (first b)) [a b]
+                                        (sync-seq (align-seq (sort-by first [a b])))))
+                (diff-first [s    ] (let [[[a & m] [b & n] & r] (partition-by first s)]
+                                      (apply concat [a b] m n r)))
+                (sync-seqs  [s    ] (if (apply = (map first s)) (first (first s))
+                                        (let [[a b] (split-at 2 (diff-first s))]
+                                          (sync-seqs (concat (sync-seq a) b)))))]
+             (sync-seqs (map #(map (partial * %) 
+                                   (map inc (range)))
+                             a)))))
 
-(defn f
-  [& a] (letfn [(sync-seq [[a b]] (if (= (first a) (first b))
-                                    [a b]
-                                    (sync-seq (align-seq (sort-by-first [a b])))))
-                (diff-first [s] (let [[[a & m] [b & n] & r] (partition-by first s)]
-                                  (apply concat [a b] m n r)))
-                (sync-seqs [s] (if (apply = (map first s)) (first (first s))
-                                   (let [[a b] (split-at 2 (diff-first s))]
-                                     (sync-seqs (concat (sync-seq a) b)))))]
-          (sync-seqs (map #(map (partial * %) 
-                                (map inc (range)))
-                          a))))
+(fact
+   (g 2 3) => 6)
+(fact
+   (g 5 3 7) => 105)
+(fact
+   (g 1/3 2/5) => 2)
+(fact
+   (g 3/4 1/6) => 3/2)
+(fact
+   (g 7 5/7 2 3/5) => 210)
+
 
 (defn gcd
   [& a] (loop [c (apply max a)]
@@ -136,7 +148,10 @@
             (recur (dec c)))))
 
 (fact
-  (gcd 12 18 6) => 6)
+  (gcd 12 18 6) => 6
+  (gcd 5 3 7)   => 1)
+
+
 
 (def gcd
   (fn [& a] (/ (reduce * a)
@@ -145,15 +160,12 @@
                   c
                   (recur (dec c)))))))
 
-(fact
-   (f 2 3) => 6)
-(fact
-   (f 5 3 7) => 105)
-(fact
-   (f 1/3 2/5) => 2)
-(fact
-   (f 3/4 1/6) => 3/2)
-(fact
-   (f 7 5/7 2 3/5) => 210)
+(def f
+  (fn [& a] 
+    (loop [c (apply max a)]
+      (if (every? #(zero? (rem % c)) a)
+        c
+        (recur (dec c))))))
+
 
 
