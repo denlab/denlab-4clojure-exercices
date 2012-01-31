@@ -12,7 +12,10 @@
 ;; accepts an integer n, and returns true iff n is balanced.
 
 (def f
-  (fn [n]))
+  (fn [n] (loop [c (str n) a #{} b #{}]
+           (if (second c)
+             (recur (rest (butlast c)) (conj a (first c)) (conj b (last c)))
+             (= a b)))))
 
 (fact
   (f 11) => true )
