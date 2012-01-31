@@ -16,7 +16,7 @@
 (def m (zipmap "IVXLCDM" [1 5 10 50 100 500 1000]))
 
 
-(unfinished decomp)
+(unfinished )
 
 (defn transcod
   [x] 
@@ -27,6 +27,27 @@
 (fact "transcod"
   (transcod 3000) => "MMM"
   (transcod 900) => "CM")
+
+(defn decomp
+  [n] 
+  (map #(* (first %) )
+       (remove #(= \0 (first %))
+               (map vector (str n) (range)))))
+
+(defn f
+  [[curr d o]] (let [r (rem curr d)]
+                 [(- curr r)
+                  (* 10 d)
+                  (cons r o)]))
+
+(defn decomp
+  [n] (loop [curr n d 10 o []]
+        (if (zero? curr) o
+            (let [r (rem curr d)]
+              (recur (- curr r) (* 10 d) (cons r o)))))) 
+
+(fact "decomp" 
+  (decomp 3909) => [3000 900 0 9])
 
 (defn g 
   [n] (reduce str (map transcod (decomp n))))

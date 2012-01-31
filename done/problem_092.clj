@@ -38,12 +38,20 @@
 
 (fact
  (g "XIV") => 14 )
+;;   X IV
+;;  10 4
 
 (fact
  (g "DCCCXXVII") => 827 )
+;;   D   C   C   C  X  X V I I
+;;500  100 100 100 10 10 5 1 1 
 
 (fact
  (g "MMMCMXCIX") => 3999 )
+;; M    M    M    CM   XC  IX
+;; 1000 1000 1000 900  90  9
 
 (fact
  (g "XLVIII") => 48 )
+;;   XL V I I I
+;;   40 5 1 1 1 
