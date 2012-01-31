@@ -13,25 +13,39 @@
 ;; of k distinct elements taken from S. The number of k-combinations
 ;; for a sequence is equal to the binomial coefficientN.
 
+
+
 (def g
-  (fn [n s]))
+  (fn [n s] (cond (= 1 n)
+                 (set
+                  (map
+                   hash-set
+                   s))
+                 (= (count s) n) #{s}
+                 :else           :wtf)))
 
 (fact
+ (g 1 #{:a}) => #{#{:a}}) 
+
+(fact
+ (g 2 #{:a :b}) => #{#{:a :b}}) 
+
+(future-fact
  (g 1 #{4 5 6}) => #{#{4} #{5} #{6}})
 
-(fact
+(future-fact
  (g 10 #{4 5 6}) => #{})
 
-(fact
+(future-fact
  (g 2 #{0 1 2}) => #{#{0 1} #{0 2} #{1 2}})
 
-(fact
+(future-fact
  (g 3 #{0 1 2 3 4}) => #{#{0 1 2} #{0 1 3} #{0 1 4} #{0 2 3} #{0 2 4}
                          #{0 3 4} #{1 2 3} #{1 2 4} #{1 3 4} #{2 3 4}})
 
-(fact
+(future-fact
  (g 4 #{[1 2 3] :a "abc" "efg"}) => #{#{[1 2 3] :a "abc" "efg"}})
 
-(fact
+(future-fact
  (g 2 #{[1 2 3] :a "abc" "efg"}) => #{#{[1 2 3] :a} #{[1 2 3] "abc"} #{[1 2 3] "efg"}
                                        #{:a "abc"} #{:a "efg"} #{"abc" "efg"}})
