@@ -17,6 +17,12 @@
              (recur (butlast r) (conj a f) (conj b (last r)))
              (= a b)))))
 
+(def g
+  #(loop [[f & r] (str %) a #{} b #{}]
+     (if (seq r)
+       (recur (butlast r) (conj a f) (conj b (last r)))
+       (= a b))))
+
 (fact
   (g 11) => true )
 (fact
