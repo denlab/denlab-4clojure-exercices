@@ -28,20 +28,12 @@
 ;; D 	500
 ;; M 	1000
 
-(unfinished)
-
-(def transco
-  {\I 1 \V 5 \X 10 \L 50 \C 100 \D 500 \M 1000})
-
-(def transco
-  (zipmap "IVXLCDM" [1 5 10 50 100 500 1000]))
-
 (def g
-  #(loop [[a b & r] (map transco %) m 0]
+  #(loop [[a b & r] (map (zipmap "IVXLCDM" [1 5 10 50 100 500 1000]) %) m 0]
      (cond
       (nil? a) m
       (nil? b) (+ m a)
-      (< a b ) (recur r (+ m (- b a)))
+      (< a b)  (recur r          (+ m (- b a)))
       :else    (recur (cons b r) (+ m a)))))
 
 (fact
