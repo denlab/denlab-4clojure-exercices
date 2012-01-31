@@ -20,19 +20,22 @@
  (combin :a #{#{:b} #{:c}}) => #{#{:a :b} #{:a :c}})
 
 (def g
-  (fn [n s]
-    (prn (str "(g " n " " s ")"))
-    (cond (= 1 n)         (set (map hash-set s))
-          (= (count s) n) #{(set s)}
-          :else           (set (into (combin (first s)
-                                             (g (dec n) (rest s)))
-                                     (g n (rest s)))))))
+  (fn f [n s] (set
+              (cond (= 1 n) (map hash-set s)
+                    :else   (into (combin (first s)
+                                          (f (dec n) (rest s)))
+                                  (f n (rest s)))))))
+
+(def g
+  (fn f [n s] (set
+              (cond
+               (= 1 n)         (map hash-set s)
+               (< (count s) n) #{}
+               :else           (into (set (map #(conj % (first s)) (f (dec n) (rest s))))
+                                     (f n (rest s)))))))
 
 (fact
  (g 2 #{:a :b :c}) => #{#{:a :b} #{:a :c} #{:c :b}}) 
-
-(comment (concat (combin :a (g 1 #{:b :c}))
-                 (g 2 #{:b :c})))
 
 (fact
  (g 1 #{:b :c}) => #{#{:b} #{:c}})
@@ -43,22 +46,22 @@
 (fact
  (g 1 #{:a}) => #{#{:a}}) 
 
-(future-fact
+(fact
  (g 1 #{4 5 6}) => #{#{4} #{5} #{6}})
 
-(future-fact
+(fact
  (g 10 #{4 5 6}) => #{})
 
-(future-fact
+(fact
  (g 2 #{0 1 2}) => #{#{0 1} #{0 2} #{1 2}})
 
-(future-fact
+(fact
  (g 3 #{0 1 2 3 4}) => #{#{0 1 2} #{0 1 3} #{0 1 4} #{0 2 3} #{0 2 4}
                          #{0 3 4} #{1 2 3} #{1 2 4} #{1 3 4} #{2 3 4}})
 
-(future-fact
+(fact
  (g 4 #{[1 2 3] :a "abc" "efg"}) => #{#{[1 2 3] :a "abc" "efg"}})
 
-(future-fact
+(fact
  (g 2 #{[1 2 3] :a "abc" "efg"}) => #{#{[1 2 3] :a} #{[1 2 3] "abc"} #{[1 2 3] "efg"}
                                        #{:a "abc"} #{:a "efg"} #{"abc" "efg"}})
