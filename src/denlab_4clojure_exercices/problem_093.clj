@@ -13,7 +13,33 @@
 ;; sequences with only one level of nesting.
 
 (def g
-  (fn [x]))
+  (fn [x] (if (sequential? (first x))
+           (concat (g (first x)) (g (rest x)))
+           [x])))
+
+(def g
+  (fn [x] (cond (sequential? (first x)) (concat (g (first x)) (g (rest x)))
+               :else                   [x])))
+
+(def g
+  (fn [x] (cond (sequential? (first x)) (mapcat #(g %) x)
+               :else                   [x])))
+
+(def g
+  (fn [[f & _ :as s]] (cond (sequential? f) (mapcat g s)
+                           :else                   [s])))
+
+(def g
+  #(cond (sequential? (first %)) (mapcat g %)
+         :else                   [%]))
+
+(def g
+  (fn f [s] (cond (sequential? (first s)) (mapcat f s)
+                 :else                   [s])))
+
+(def g
+  (fn f [s] (if (sequential? (first s)) (mapcat f s)
+                                [s])))
 
 (fact
  (g [["Do"] ["Nothing"]]) => [["Do"] ["Nothing"]])
