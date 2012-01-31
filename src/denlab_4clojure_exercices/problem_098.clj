@@ -15,7 +15,7 @@
 ;; f.
 
 (def e
-  (fn [f s] (set (map set (partition-by f s)))))
+  #(set (map set (vals (group-by % %2)))))
 
 (fact
   (e #(* % %)          #{-2 -1 0 1 2})  => #{#{0} #{1 -1} #{2 -2}})
