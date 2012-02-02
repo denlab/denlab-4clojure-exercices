@@ -7,7 +7,6 @@
 ;; Difficulty:	Medium
 ;; Topics:	strings math
 
-
 ;; This is the inverse of Problem 92M, but much easier. Given an
 ;; integer smaller than 4000, return the corresponding roman numeral
 ;; in uppercase, adhering to the subtractive principleN.
@@ -21,7 +20,7 @@
 (defn transcod
   [x] 
   ({1  "I" , 4   "IV", 7     "VII" , 8   "VIII", 9    "IX", 20 "XX", 30 "XXX", 40 "XL",
-    90 "CL", 100 "C" , 800   "DCCC", 900 "CM"  , 3000 "MMM"}
+    90 "XC", 100 "C" , 800   "DCCC", 900 "CM"  , 3000 "MMM"}
    x))
 
 (fact "transcod"
@@ -59,28 +58,23 @@
     (transcod :e1) => "R1"
     (transcod :e2) => "R2"))
 
+(fact
+ (g 1) => "I")
 
-(future-fact
- (g 1) => "I" )
-
-(future-fact
+(fact
  (g 30) => "XXX" )
 
-(future-fact
+(fact
  (g 4) => "IV" )
 
-(future-fact
+(fact
  (g 140) => "CXL" )
 
-(future-fact
+(fact
  (g 827) => "DCCCXXVII" )
 
-(future-fact
+(fact
  (g 3999) => "MMMCMXCIX" )
 
-(future-fact
+(fact
  (g 48) => "XLVIII" )
-
-{1 "I", 2 "II", 3 "III", 4 "IV", 5 "V", "VI" , "VII", "VIII", "IV"}
-
-{10 "X", 11 "XI", 12 "XII", 13 "XIII", 14 "XIV", 15 "XV" , 16 "XVI", 17 "XVII", 18 "XVIII", 19 "IX"}
