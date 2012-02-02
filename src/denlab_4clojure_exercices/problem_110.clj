@@ -19,8 +19,38 @@
 ;; return an infinite lazy sequence of pronunciations, each element
 ;; being a pronunciation of the previous element.
 
+(unfinished )
+
+(defn mv
+  [s] (reduce (fn [r i] (do (prn "r=" r "i=" i)
+                         (if (= i (second (last r)))
+                          (update-in r [(dec (count r)) 0] inc)
+                          (conj r [1 i]))))
+       []
+       s))
+
+(defn mv
+  [s] (reduce (fn [r i] (if (= i (last r))
+                         (update-in r [(- (count r) 2)] inc)
+                         (conj r 1 i)))
+              [] 
+              s))
+
+(fact "mv"
+      (mv [1 1] ) => [2 1])
+
+(fact "mv"
+      (mv [2 1]) => [1 2 1 1])
+
 (def g
-  (fn [x]))
+  (fn [x] (rest (iterate mv x))))
+
+(fact
+ (take 3 (g :a)) => [:b :c :d]
+ (provided
+  (mv :a) => :b
+  (mv :b) => :c
+  (mv :c) => :d))
 
 (fact
  (take 3 (g [1]))           => [[1 1] [2 1] [1 2 1 1]])
