@@ -49,10 +49,10 @@
                  30   "XXX" , 40  "XL"  , 90  "XC" ,
                  100  "C"   , 800 "DCCC", 900 "CM" ,
                  3000 "MMM"}
-                (loop [curr % d 10 o []]
-                  (if (zero? curr) o
-                      (let [r (rem curr d)]
-                        (recur (- curr r) (* 10 d) (cons r o))))))))
+                (loop [c % d 10 o []]
+                  (if (zero? c) o
+                      (let [r (rem c d)]
+                        (recur (- c r) (* 10 d) (cons r o))))))))
 
 (fact
  (final 1)    => "I")
