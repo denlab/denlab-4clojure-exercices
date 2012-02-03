@@ -53,6 +53,14 @@
                                        s))
                         x))))
 
+(def g
+  (fn [x] (rest (iterate (fn [s] (reduce #(if (= %2 (last %))
+                                          (update-in % [(- (count %) 2)] inc)
+                                          (conj % 1 %2))
+                                       [] 
+                                       s))
+                        x))))
+
 (future-fact
  (take 3 (g :a)) => [:b :c :d]
  (provided
