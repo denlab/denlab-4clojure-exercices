@@ -11,12 +11,24 @@
 ;; sequence. The sequences may be infinite, so be careful to search
 ;; lazily.
 
-(defn g
-  [& s])
+ 
+(def g
+  (fn [& a] (letfn
+               [(align-seq  [[a b]] [(drop-while #(< % (first b)) a)
+                                     b])
+                (sync-seq   [[a b]] (if (= (first a) (first b)) [a b]
+                                        (sync-seq (align-seq (sort-by first [a b])))))
+                (diff-first [s    ] (let [[[a & m] [b & n] & r] (partition-by first s)]
+                                      (apply concat [a b] m n r)))
+                (sync-seqs  [s    ] (if (apply = (map first s))
+                                      (first (first s))
+                                      (let [[a b] (split-at 2 (diff-first s))]
+                                        (sync-seqs (concat (sync-seq a) b)))))]
+             (sync-seqs a))))
 
 (fact
  (g [3 4 5]) => 3 )
-
+ 
 (fact
  (g [1 2 3 4 5 6 7] [0.5 3/2 4 19]) => 4 )
 
