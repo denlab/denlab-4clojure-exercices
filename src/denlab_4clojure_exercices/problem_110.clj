@@ -22,14 +22,6 @@
 (unfinished )
 
 (defn mv
-  [s] (reduce (fn [r i] (do (prn "r=" r "i=" i)
-                         (if (= i (second (last r)))
-                          (update-in r [(dec (count r)) 0] inc)
-                          (conj r [1 i]))))
-       []
-       s))
-
-(defn mv
   [s] (reduce (fn [r i] (if (= i (last r))
                          (update-in r [(- (count r) 2)] inc)
                          (conj r 1 i)))
@@ -43,17 +35,6 @@
       (mv [2 1]) => [1 2 1 1])
 
 (def g
-  (fn [x] (rest (iterate mv x))))
-
-(def g
-  (fn [x] (rest (iterate (fn [s] (reduce (fn [r i] (if (= i (last r))
-                                                  (update-in r [(- (count r) 2)] inc)
-                                                  (conj r 1 i)))
-                                       [] 
-                                       s))
-                        x))))
-
-(def g
   (fn [x] (rest (iterate (fn [s] (reduce #(if (= %2 (last %))
                                           (update-in % [(- (count %) 2)] inc)
                                           (conj % 1 %2))
@@ -61,13 +42,6 @@
                                        s))
                         x))))
 
-(future-fact
- (take 3 (g :a)) => [:b :c :d]
- (provided
-  (mv :a) => :b
-  (mv :b) => :c
-  (mv :c) => :d))
- 
 (fact
  (take 3 (g [1]))           => [[1 1] [2 1] [1 2 1 1]])
 (fact
