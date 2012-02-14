@@ -28,13 +28,6 @@
                            (next
                             (iterate #(adv p %) [s nil 0]))))) 
 
-(defn g
-  [n p s] (map second
-               (take-while #(< (nth % 2) n)
-                           (next
-                            (iterate (fn [[[f & r] _ w]] [r f (if (p f) (inc w) w)])
-                                     [s nil 0]))))) 
-
 (def g
   (fn [n p s] (map second
                   (take-while #(< (nth % 2) n)
