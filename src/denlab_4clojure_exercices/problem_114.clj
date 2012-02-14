@@ -28,6 +28,20 @@
                            (next
                             (iterate #(adv p %) [s nil 0]))))) 
 
+(defn g
+  [n p s] (map second
+               (take-while #(< (nth % 2) n)
+                           (next
+                            (iterate (fn [[[f & r] _ w]] [r f (if (p f) (inc w) w)])
+                                     [s nil 0]))))) 
+
+(def g
+  (fn [n p s] (map second
+                  (take-while #(< (nth % 2) n)
+                              (next
+                               (iterate (fn [[[f & r] _ w]] [r f (if (p f) (inc w) w)])
+                                        [s nil 0])))))) 
+
 (fact 
    (g 4 #(= 2 (mod % 3))
          [2 3 5 7 11 13 17 19 23]) => [2 3 5 7 11 13])
