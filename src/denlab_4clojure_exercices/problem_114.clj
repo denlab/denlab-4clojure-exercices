@@ -2,7 +2,7 @@
   denlab-4clojure-exercices.problem-114
   (:use [midje.sweet]
         [clojure
-         [repl :only [doc]]
+         [repl   :only [doc]]
          [pprint :only [pprint]]]))
 
 ;; Global take-while
@@ -19,8 +19,14 @@
 ;; sequence. It should return a lazy sequence of items in the list up
 ;; to, but not including, the nth item that satisfies the predicate.
 
+(defn adv
+  [p [[f & r] _ sm]] [r f (if (p f) (inc sm) sm)])
+
 (defn g
-  [n p s]) 
+  [n p s] (map second
+               (take-while #(< (nth % 2) n)
+                           (next
+                            (iterate #(adv p %) [s nil 0]))))) 
 
 (fact 
    (g 4 #(= 2 (mod % 3))
