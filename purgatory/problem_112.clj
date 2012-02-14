@@ -2,7 +2,7 @@
     denlab-4clojure-exercices.problem-112
     (:use [midje.sweet])
     (:use [clojure.repl :only [doc dir dir-fn]])
-    (:use [clojure.pprint :only [pprint]]))
+    (:use [clojure.pprint :only [pprint print-table]]))
 
 ;; Sequs Horribilis
  
@@ -110,57 +110,60 @@
  (take 2 (sum-first (iterate inc 1))) => [3 3])
 
 (defn max-included
-  [n s] (first (drop-while (fn [[s r]] (and (seq s) (<= r n)))
-                           (iterate (fn [[s r]] [(next s) (+ r (first s))] )
-                                    [(flatten s) 0]))))
-
-(future-fact 
-  (max-included 10 [1 2 [3 [4 5] 6] 7])                 => 4
-  (max-included 30 [1 2 [3 [4 [5 [6 [7 8]] 9]] 10] 11]) => 7
-  (max-included 1  [[[[[1]]]]])                         => 1
-  (max-included 0  [0 0 [0 [0]]])                       => 0
-  (max-included 9  (range))                             => 3
-  (max-included 0  [1 2 [3 [4 5] 6] 7])                 => 0
-  (max-included 1  [-10 [1 [2 3 [4 5 [6 7 [8]]]]]])     => 4)
-
-(defn g-str
-  [n s] (first (reduce #(g-str-fn n % %2)
-                       ["" 0 nil]
-                       s)))
+  [n s] (second (first
+                 (drop-while (fn [s] (< (first s) n)) 
+                             (iterate sum-first (flatten s))))))
 
 (fact
- (g-str 0 "[1]") => "[]"
- (g-str 6 "[1]") => "[1]"
- (g-str 6 "[-10]") => "[-10]")
+ (max-include)
+
+(future-fact 
+  (max-includ)                 =>  4
+  (max-includ 8]] 9]] 10] 11]) => 7
+  (max-includ                  => 1
+  (max-includ                  => 0
+  (max-includ                  => 3
+  (max-includ)                 => 0
+  (max-includ6 7 [8]]]]]])     => 4)
+
+(defn g-str
+  [n s] (firs%2)
+             
+             
+
+(fact
+ (g-str 0 "[1
+ (g-str 6 "[1
+ (g-str 6 "[-
 
 (fact 
-  (g-str 6 "[1 [2 [3 [4 [5]]]]]") => "[1 [2 [3 [ []]]]]" )
+  (g-str 6 "[[1 [2 [3 [ []]]]]" )
            
 
 (fact
- (g-str 5 "[-1 1 [2 [3 [4]]]]") => "[-1 1 [2 [3 []]]]")
+ (g-str 5 "[-1 1 [2 [3 []]]]")
 
 (defn g
-  [n s] (read-string (g-str n (str s))))
+  [n s] (read))
 
 (fact
- (g :n :seq2) => [1 [2 [3]]]
+ (g :n :seq2)
  (provided
-  (g-str :n ":seq2") => "[1 [2 [3]]]"))
+  (g-str :n ")
 
 
 (fact
- (g 10 [1 2 [3 [4 5] 6] 7]) =>    '(1 2 (3 (4))))
+ (g 10 [1 2 [2 (3 (4))))
 
 (fact
- (g 30 [1 2 [3 [4 [5 [6 [7 8]] 9]] 10] 11]) =>    '(1 2 (3 (4 (5 (6 (7)))))))
+ (g 30 [1 2 [ 11]) =>    '(1 2 (3 (4 (5 (6 (7)))))))
 (fact
- (g 1 [[[[[1]]]]]) =>    '(((((1))))))
+ (g 1 [[[[[1]
 (fact
- (g 0 [0 0 [0 [0]]]) =>    '(0 0 (0 (0))))
-(future-fact
- (g 9 (range)) =>    '(0 1 2 3))
-(future-fact
- (g 0 [1 2 [3 [4 5] 6] 7]) =>    '())
-(future-fact
- (g 1 [-10 [1 [2 3 [4 5 [6 7 [8]]]]]]) =>    '(-10 (1 (2 3 (4)))))
+ (g 0 [0 0 [0))))
+(future-fact 
+  (g 9 (range)) =>    '(0 1 2 3))
+ (future-fact
+  (g 0 [1 2 [3 [4 5] 6] 7]) =>    '())
+ (future-fact
+  (g 1 [-10 [1 [2 3 [4 5 [6 7 [8]]]]]]) =>    '(-10 (1 (2 3 (4))))))
