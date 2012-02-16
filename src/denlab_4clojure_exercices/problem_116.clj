@@ -72,11 +72,11 @@
 (fact
  (g 4) => falsey)
 
-(future-fact
+(fact
  (g 2) => falsey)
 
 (fact
  (g 563) => truthy)
 
-(future-fact
+(fact
  (nth (filter g (range)) 15) => 1103)
