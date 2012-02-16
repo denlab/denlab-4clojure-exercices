@@ -79,13 +79,13 @@
       (provided
        (p-ival :n) => nil))
 
-(defn g "Given an int, if n is not prime, return false, otherwise return [previous-prime next-prime]"
-  [n] (loop [curr 2 [x y z & r :as a] []]
-        (if (and x (< n x)) 
-          (and (= n y) (not= 2 n) (= n (/ (+ z x) 2)))
-          (if (some #(zero? (rem curr %)) a)
-            (recur (inc curr) a)
-            (recur (inc curr) (cons curr a))))))
+(def g "Given an int, if n is not prime, return false, otherwise return [previous-prime next-prime]"
+  (fn [n] (loop [curr 2 [x y z & r :as a] '()]
+           (if (and x (< n x)) 
+             (and (= n y) (not= 2 n) (= n (/ (+ z x) 2)))
+             (if (some #(zero? (rem curr %)) a)
+               (recur (inc curr) a)
+               (recur (inc curr) (cons curr a))))))) 
 
 
 
