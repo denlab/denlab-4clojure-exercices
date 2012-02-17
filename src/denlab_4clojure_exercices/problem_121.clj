@@ -26,7 +26,7 @@
 
 (def g
   #(fn [m] (letfn [(f [x] (if (sequential? x)
-                           (apply (resolve (first x)) (map f (rest x)))
+                           (apply ({'+ + '/ / '- - '* *} (first x)) (map f (rest x)))
                            (if-let [v (m x)] v x)))] 
             (f %))))
 
