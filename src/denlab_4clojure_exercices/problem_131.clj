@@ -19,12 +19,16 @@
                            [#{}]))
         seq))
 
-(defn g
-  [& s] (seq (apply clojure.set/intersection
-                    (map (fn [x]
-                           (set (map #(reduce + %)
-                                     (remove empty? x))))
-                         (map p s)))))
+(def g
+  (let [p (comp set
+                (fn p [[f & r]] (if f (concat (p r) [#{f}] (map #(conj % f) (p r)))
+                                   [#{}]))
+                seq)]
+    (fn [& s] (not (empty? (apply clojure.set/intersection
+                                 (map (fn [x]
+                                        (set (map #(reduce + %)
+                                                  (remove empty? x))))
+                                      (map p s))))))))
 
 (fact
   (g #{-1 1 99}
