@@ -13,8 +13,27 @@
 ;; function has to accept a single parameter containing the map of
 ;; variable names to their values.
 
-(defn g
-  [x] identity)
+(defn f
+  [x] (if (sequential? x)
+        (do
+          (prn "->1 " "first x=" (first x) "(rest x)=" (rest x))
+          (let [frst (first x)
+                mm   (doall (map f (rest x)))]
+            (do (prn "fsrt=" frst "mm=" mm)
+                (prn "(apply frst mm) => " "(apply " (resolve frst) mm ")")
+                (apply (resolve frst) mm))))
+        (do (prn "->2" "x=" x) x)))
+
+(fact
+  (f '(/ 16 8)) => 2)
+
+(fact
+   (f '(+ 2 4 2)) => 8)
+
+(def g
+  #(fn [m] (let [expr (clojure.walk/prewalk (fn [x] (if-let [v (m x)] v x)) %)]
+            (do (prn "expr=" expr)
+                (f expr)))))
 
 (fact
   ((g '(/ a b))
