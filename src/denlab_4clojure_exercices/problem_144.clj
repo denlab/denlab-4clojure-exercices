@@ -13,11 +13,13 @@
 ;; from the first function after it hits the end.
 
 (defn g
-  [& f])
+  [v & f] (map first 
+               (iterate (fn [[w h]] [((first h) w) (rest h)])
+                        [v (cycle f)])))
 
 (fact
-  (take 3 (g 3.14 int double)) =>  [3.14 3 3.0])
+  (take 3 (g 3.14 int double))        =>  [3.14 3 3.0])
 (fact
-  (take 5 (g 3 #(- % 3) #(+ 5 %))) =>  [3 0 5 2 7])
+  (take 5 (g 3 #(- % 3) #(+ 5 %)))    =>  [3 0 5 2 7])
 (fact
   (take 12 (g 0 inc dec inc dec inc)) =>  [0 1 0 1 0 1 2 1 2 1 2 3])
