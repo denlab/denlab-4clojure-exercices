@@ -18,7 +18,12 @@
 
 (defn h
   [n a] (let [m (quot (dec n) a)]
-          (* m (inc m) 1/2 a)))
+          (/
+           (*'
+            m
+            (inc
+             m)  a)
+           2)))
 
 (fact
   (h 10 3) =>  18 )
@@ -27,7 +32,9 @@
   (h 10 2) => 20)
 
 (defn g
-  [n a b] (+ (h n a) (h n b) (- (h n (* a b)))))
+  [n a b] (+ (h n a)
+             (h n b)
+             (- (h n (* a b)))))
 
 (defn exp
   [n a b] (map #(vector % (if (or (some (fn [x] (zero? (rem % x)))
@@ -41,13 +48,15 @@
   (g 16 3 5)                               =>  60)
 (fact
   (g 3 17 11)                              =>  0 )
-(future-fact
+(fact
   (g 1000 3 5)                             =>  233168 )
-(future-fact
+(fact
   (str (g 100000000 3 5))                  =>  "2333333316666668" )
-(future-fact
+(fact
   (str (g (* 10000 10000 10000) 7 11))     =>  "110389610389889610389610")
-(future-fact
+(fact
   (str (g (* 10000 10000 10000) 757 809))  =>  "1277732511922987429116")
-(future-fact
+(fact
   (str (g (* 10000 10000 1000) 1597 3571)) =>  "4530161696788274281")
+
+(prn)
