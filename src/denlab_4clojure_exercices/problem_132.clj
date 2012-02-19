@@ -35,14 +35,12 @@
                                                                     [r  [  b]]))
                                              [(pairify2 s) []])))))
 
-(defn g
-  [p v s] (if (seq s)
-            (cons (first s)
-                  (flatten (map (fn [x [b a]] (if (p b a)
-                                               [v a]
-                                               [a]))
-                                s (partition 2 1 s))))
-            []))
+(def g
+  (fn [p v s] (if (seq s)
+               (cons (first s)
+                     (flatten (map (fn [[b a]] (if (p b a) [v a] a))
+                                   (partition 2 1 s))))
+               [])))
 
 
 
