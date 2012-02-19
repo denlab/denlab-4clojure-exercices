@@ -28,18 +28,19 @@
 ;; :rank. Cards with a larger rank are stronger.
 
 (defn g
-  [t] identity)
+  [t] (fn [c] (let [tr (if t t (:suit (first c)))]
+               (filter #(= tr (:suit %))
+                       c))))
 
 (fact
-  (let [notrump (g nil)]
-    (notrump [{:suit :club :rank 4}
-              {:suit :club :rank 9}]) => {:suit :club :rank 9}
-              
-    (notrump [{:suit :spade :rank 2}
-              {:suit :club :rank 10}]) => {:suit :spade :rank 2}))
-(fact
+  ((g nil) [{:suit :club :rank 4}
+            {:suit :club :rank 9}]) => {:suit :club :rank 9})
+(future-fact
+  ((g nil) [{:suit :spade :rank 2}
+            {:suit :club :rank 10}]) => {:suit :spade :rank 2})
+(future-fact
   ((g :club) [{:suit :spade :rank 2}
               {:suit :club :rank 10}]) =>  {:suit :club :rank 10} )
-(fact
+(future-fact
   ((g :heart) [{:suit :heart :rank 6} {:suit :heart :rank 8}
                {:suit :diamond :rank 10} {:suit :heart :rank 4}]) =>  {:suit :heart :rank 8})
