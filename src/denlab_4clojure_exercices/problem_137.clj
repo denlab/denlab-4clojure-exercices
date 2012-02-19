@@ -24,6 +24,32 @@
                         (iterate (fn [[x r]] [(quot x b) (conj r (rem x b))])
                                  [n '()])))))) 
 
+(defn p
+  [[_ x]] (prn "x=" x) (not= 0 x))
+
+(defn p
+  [x] (not (zero? (second x))))
+
+(def p (comp not zero? second))
+
+(fact
+  (p [:a 1]) => truthy)
+
+(fact
+  (p [:a 0]) => falsey) 
+
+(defn g
+  [n b] (if (zero? n) [0]
+            (ffirst
+             (drop-while (fn [[_ x]] (not= 0 x))
+                         (iterate (fn [[r x]] [(conj r (rem x b)) (quot x b)])
+                                  ['() n]))))) 
+(defn g
+  [n b] (if (zero? n) [0]
+            (ffirst
+             (drop-while (comp not zero? second)
+                         (iterate (fn [[r x]] [(conj r (rem x b)) (quot x b)])
+                                  ['() n]))))) 
 (fact
   (g 9 2) =>  [1 0 0 1] )
 (fact
