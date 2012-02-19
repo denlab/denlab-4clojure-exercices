@@ -28,9 +28,10 @@
 ;; Recognize Playing Cards: a hash-map of :suit and a numeric
 ;; :rank. Cards with a larger rank are stronger.
 
-(defn g
-  [t] (fn [c] (apply max-key :rank (filter #(= (if t t (:suit (first c))) (:suit %))
-                                          c))))
+(def g
+  (fn [t] (fn [c] (apply max-key :rank
+                       (filter #(= (if t t (:suit (first c))) (:suit %))
+                               c)))))
 
 (fact
   ((g nil) [{:suit :club :rank 4}
