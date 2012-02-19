@@ -30,9 +30,9 @@
   (g 1234501 10) =>  [1 2 3 4 5 0 1] )
 (fact
   (g 0 11) =>  [0] )
-(future-fact
+(fact
   (let [n (rand-int 100000)](g n n)) =>  [1 0] )
-(future-fact
+(fact
   (g Integer/MAX_VALUE 42) =>  [16 18 5 24 15 1] )
 
 
