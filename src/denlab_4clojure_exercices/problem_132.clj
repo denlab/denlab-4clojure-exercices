@@ -12,35 +12,12 @@
 ;; a collection; and returns a new collection where the value is
 ;; inserted between every two items that satisfy the predicate.
 
-(defn- pairify
-  [s] (map vector
-           (rest s)
-           (partition 2 1 s)))
-
-(defn- pairify2
-  [s] (partition 2 1 s))
-
-(def s (pairify2  [1 6 7 4 3]))
-(def i (iterate (fn [[[[a b] & r] o]] (if (< a b)
-                                       [(if (nil? r) :end r)  [a :less b]]
-                                       [(if (nil? r) :end r)  [a       b]]))
-        [s []]))
-
-
-(defn g
-  [p v s] (flatten (map second
-                        (take-while #(not (nil? (first %)))
-                                    (iterate (fn [[[[a b] & r] o]] (if (p a b)
-                                                                    [r  [v b]]
-                                                                    [r  [  b]]))
-                                             [(pairify2 s) []])))))
-
 (def g
-  (fn [p v s] (if (seq s)
-               (cons (first s)
-                     (flatten (map (fn [[b a]] (if (p b a) [v a] a))
-                                   (partition 2 1 s))))
-               [])))
+  #(if (seq %3)
+     (cons (first %3)
+           (flatten (map (fn [[b a]] (if (% b a) [%2 a] a))
+                         (partition 2 1 %3))))
+     []))
 
 
 
