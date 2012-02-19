@@ -55,7 +55,7 @@
 (fact
  (g > :more ()) => [])
 
-(future-fact
+(fact
  (take 12 (->> [0 1]
                (iterate (fn [[a b]] [b (+ a b)]))
                (map first)              ; fibonacci numbers
