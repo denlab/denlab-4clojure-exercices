@@ -16,31 +16,23 @@
 ;; Note: Some test cases have a very large n, so the most obvious
 ;; solution will exceed the time limit.
 
-(defn h
+(defn s
   [n a] (let [m (quot (dec n) a)]
-          (/
-           (*'
-            m
-            (inc
-             m)  a)
-           2)))
+          (/ (*' m (inc m)  a) 2)))
 
 (fact
-  (h 10 3) =>  18 )
+  (s 10 3) =>  18 )
 
 (fact
-  (h 10 2) => 20)
+  (s 10 2) => 20)
 
 (defn g
-  [n a b] (+ (h n a)
-             (h n b)
-             (- (h n (* a b)))))
+  [n a b] (+ (s n a) (s n b) (- (s n (* a b)))))
 
-(defn exp
-  [n a b] (map #(vector % (if (or (some (fn [x] (zero? (rem % x)))
-                                        [a b]))
-                            :yes))
-               (iterate inc 1)))
+(def g
+  (let [s (fn [n a] (let [m (quot (dec n) a)]
+                     (/ (*' m (inc m) a) 2)))]
+    (fn [n a b] (+ (s n a) (s n b) (- (s n (* a b)))))))
 
 (fact
   (g 10 3 5)                               =>  23 )
