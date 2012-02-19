@@ -29,9 +29,8 @@
 ;; :rank. Cards with a larger rank are stronger.
 
 (defn g
-  [t] (fn [c] (let [tr (if t t (:suit (first c)))]
-               (apply max-key :rank (filter #(= tr (:suit %))
-                                            c)))))
+  [t] (fn [c] (apply max-key :rank (filter #(= (if t t (:suit (first c))) (:suit %))
+                                          c))))
 
 (fact
   ((g nil) [{:suit :club :rank 4}
