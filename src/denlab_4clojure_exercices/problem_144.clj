@@ -12,10 +12,10 @@
 ;; sequence of the functions applied to the value in order, restarting
 ;; from the first function after it hits the end.
 
-(defn g
-  [v & f] (map first 
-               (iterate (fn [[w h]] [((first h) w) (rest h)])
-                        [v (cycle f)])))
+(def g
+  (fn [v & f] (map first 
+                  (iterate (fn [[w h]] [((first h) w) (rest h)])
+                           [v (cycle f)]))))
 
 (fact
   (take 3 (g 3.14 int double))        =>  [3.14 3 3.0])
