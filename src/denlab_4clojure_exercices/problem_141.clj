@@ -1,6 +1,7 @@
 (ns ^{:doc "Problem: http://www.4clojure.com/problem/141"}
-    denlab-4clojure-exercices.problem-141
-    (:use [midje.sweet]))
+  denlab-4clojure-exercices.problem-141
+  (:use [clojure.repl :only [doc]]
+        [midje.sweet]))
 
 ;; Tricky card games
  
@@ -29,18 +30,18 @@
 
 (defn g
   [t] (fn [c] (let [tr (if t t (:suit (first c)))]
-               (filter #(= tr (:suit %))
-                       c))))
+               (apply max-key :rank (filter #(= tr (:suit %))
+                                            c)))))
 
 (fact
   ((g nil) [{:suit :club :rank 4}
             {:suit :club :rank 9}]) => {:suit :club :rank 9})
-(future-fact
+(fact
   ((g nil) [{:suit :spade :rank 2}
             {:suit :club :rank 10}]) => {:suit :spade :rank 2})
-(future-fact
+(fact
   ((g :club) [{:suit :spade :rank 2}
               {:suit :club :rank 10}]) =>  {:suit :club :rank 10} )
-(future-fact
+(fact
   ((g :heart) [{:suit :heart :rank 6} {:suit :heart :rank 8}
                {:suit :diamond :rank 10} {:suit :heart :rank 4}]) =>  {:suit :heart :rank 8})
