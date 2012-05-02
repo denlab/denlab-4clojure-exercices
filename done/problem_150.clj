@@ -103,35 +103,37 @@
 (def g
   (letfn [(ng-next [n]
             (let [s           (str n)
-                  seg2-right  (.length s)
+                  seg2-right  (count s)
                   seg1-right  (quot seg2-right 2)
-                  seg1        (.substring s 0 seg1-right)]
+                  seg1        (subs s 0 seg1-right)]
               (if (= "" (.replaceAll s "9" ""))
                 (+ 2 n)
                 (if (even? seg2-right)
-                  (let [seg1-ng (str (inc (Long/valueOf seg1)))]
-                    (Long/valueOf (str seg1-ng (clojure.string/reverse seg1-ng))))
-                  (let [seg1-ng (str (inc (Long/valueOf (str seg1 (.substring s seg1-right (inc seg1-right))))))
-                        seg2-ng (clojure.string/reverse (.substring seg1-ng 0 seg1-right))]
-                    (Long/valueOf (str seg1-ng seg2-ng)))))))
-          (ng-norm [n] (let [s           (str n)
-                             seg2-right  (.length s)
-                             s-even?     (even? seg2-right)
-                             seg1-right  (quot seg2-right 2)
-                             seg2-left   (+ seg1-right (if s-even? 0 1))
-                             seg1        (.substring s 0 seg1-right)
-                             cmp         (.compareTo seg1 (clojure.string/reverse (.substring s seg2-left seg2-right)))]
-                         (cond (zero? cmp) n
-                               (pos?  cmp) (Long/valueOf (str seg1 (.substring s seg1-right seg2-left) (clojure.string/reverse seg1)))
-                               :else       (if s-even?
-                                             (let [seg1-ng (str (inc (Long/valueOf seg1)))]
-                                               (Long/valueOf (str seg1-ng (clojure.string/reverse seg1-ng))))
-                                             (let [seg1-ng (str (inc (Long/valueOf (str seg1 (.substring s seg1-right seg2-left)))))
-                                                   seg2-ng (clojure.string/reverse (.substring seg1-ng 0 seg1-right))]
-                                               (Long/valueOf (str seg1-ng seg2-ng)))))))]
-    (fn [n] (if (< n 10)
-             (concat (range n 10) (iterate ng-next 11))
-             (iterate ng-next (ng-norm n))))))
+                  (let [seg1-ng (str (inc (bigint seg1)))]
+                    (bigint (str seg1-ng (clojure.string/reverse seg1-ng))))
+                  (let [seg1-ng (str (inc (bigint (str seg1 (subs s seg1-right (inc seg1-right))))))
+                        seg2-ng (clojure.string/reverse (subs seg1-ng 0 seg1-right))]
+                    (bigint (str seg1-ng seg2-ng)))))))
+          (ng-norm [n] 
+            (let [s           (str n)
+                  seg2-right  (count s)
+                  s-even?     (even? seg2-right)
+                  seg1-right  (quot seg2-right 2)
+                  seg2-left   (+ seg1-right (if s-even? 0 1))
+                  seg1        (subs s 0 seg1-right)
+                  cmp         (.compareTo seg1 (clojure.string/reverse (subs s seg2-left seg2-right)))]
+              (cond (zero? cmp) n
+                    (pos?  cmp) (bigint (str seg1 (subs s seg1-right seg2-left) (clojure.string/reverse seg1)))
+                    :else       (if s-even?
+                                  (let [seg1-ng (str (inc (bigint seg1)))]
+                                    (bigint (str seg1-ng (clojure.string/reverse seg1-ng))))
+                                  (let [seg1-ng (str (inc (bigint (str seg1 (subs s seg1-right seg2-left)))))
+                                        seg2-ng (clojure.string/reverse (subs seg1-ng 0 seg1-right))]
+                                    (bigint (str seg1-ng seg2-ng)))))))]
+    (fn [n] (map bigint
+                (if (< n 10)
+                  (concat (range n 10) (iterate ng-next 11))
+                  (iterate ng-next (ng-norm n)))))))
 
 ;; ---------------</ng>---------------------
 
@@ -174,7 +176,7 @@
                 (range 0 10000))))
 
 (fact
-  (nth (g 0) 10101) => 9102019)
+  (nth (g 0) 10101) => 9102019) 
 
 ;; -------------------- 4 clj tests --------------------
 
