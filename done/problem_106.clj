@@ -1,9 +1,9 @@
-(ns ^{:doc "Problem: http://www.4clojure.com/problem/116"}
-    denlab-4clojure-exercices.problem-116
+(ns ^{:doc "Problem: http://www.4clojure.com/problem/106"}
+    denlab-4clojure-exercices.problem-106
   (:use [midje.sweet]))
 
 ;; Number Maze
- 
+
 ;; Difficulty:	Hard
 ;; Topics:	numbers
 
@@ -96,22 +96,27 @@
                                      (if (even? c) [* / +] [* +]))))))))
 
 (def g
-  #(loop [[[c d p] & r] [[% %2 1]]]
+  #(loop [[[c d p] & r :as all-search] [[% %2 []]]]
      (if (= c d)
-       p
-       (recur (concat r (map (fn [o] [(o c 2) d (inc p)])
-                             (if (even? c) [* / +] [* +])))))))
+       (inc (count p))
+       (recur (concat r (mapcat (fn [o] (if-not (some #{c} p)
+                                         [[(do #_(println (str "o=" o ", c=" c ",p=" p ", all-search=" all-search) ) (o c 2)) d (conj p c)]]
+                                         []))
+                                (if (even? c) [* / +] [* +])))))))
 
+(def g
+  #(loop [[[c d p] & r] [[% %2 []]]]
+     (if (= c d)
+       (inc (count p))
+       (recur (concat r (mapcat (fn [o] (if-not (some #{c} p)
+                                         [[(o c 2) d (conj p c)]]
+                                         []))
+                                (if (even? c) [* / +] [* +])))))))
 
 ;; 4clj ;;
- (fact (g 1 1)  =>  1 )                ; 1
- (fact (g 3 12) =>  3 ) ; 3 6 12
- (fact (g 12 3) =>  3 ) ; 12 6 3
- (fact (g 5 9)  =>  3 )  ; 5 7 9
- (fact (g 9 12) =>  5 ) ; 9 11 22 24 12
-  (fact (g 9 2)  =>  9 )  ; 9 18 20 10 12 6 8 4 2
-(future-fact
-
-
-) 
-
+(fact (g 1 1)  =>  1 ) ; 1
+(fact (g 3 12) =>  3 ) ; 3 6 12
+(fact (g 12 3) =>  3 ) ; 12 6 3
+(fact (g 5 9)  =>  3 ) ; 5 7 9
+(fact (g 9 12) =>  5 ) ; 9 11 22 24 12
+(fact (g 9 2)  =>  9 ) ; 9 18 20 10 12 6 8 4 2
